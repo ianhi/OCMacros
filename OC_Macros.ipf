@@ -318,8 +318,6 @@ EndMacro
 // MultSectAvg() Performs Sector Averages at multiple Phi values on the result of a workfile math operation. 
 
 
-//============END ADDITIONS BY IAN =============================================================
-
 
 #pragma rtGlobals=3		// Use modern global access method and strict wave access.
 
@@ -337,6 +335,7 @@ Function calcAll()
 	calcY(path,prefix)
 	calcYZ(path,prefix)
 end
+
 
 Function calcN(path, prefix)
 	String path //C:Users:Magnetic:Hillary:TestFolder
@@ -447,11 +446,30 @@ Function/S extractPrefix(input)
 	//					"C:Users:Ian : HF_10 : HF_10_HQ:"
 	// extractPrefix ("C:Users:Ian: HF_10 : HF_10_HQ:")
 	// should return "HF_10_HQ"
-	
-	string input
+
+	String input
+	String prefix = ""
 	Variable len = strlen(input)
-	Variable pos = strSearch(input,":",len-2,1) //strSearch(str, findThisStr, start[, options]) 
-	return input[pos+1,len-2]
+	Variable pos = strSearch(input,":",len-2,1) //strSearch(str, findThisStr, start[, options]), 1 is search backwards
+	if(strsearch(input[pos+1,len-2],"_",0)==-1)
+		//If guess string contains no underscores assume we're in a new polarizations
+		// i.e. ...:MF_200_HQ:p9:
+		Variable pos2 = strSearch(input,":",pos-1,1)
+		String condInfo = input[pos2+1,pos-1]
+		Variable firstUnder = strSearch(condInfo,"_",0)
+		prefix = condInfo[0,firstUnder] + input[pos+1,len-2]+condInfo[firstUnder,strlen(condInfo)]
+	else
+		prefix = input[pos+1,len-2]
+	endif
+
+	prompt prefix,"Prefix"
+	
+	DoPrompt "If nothing entered will guess based on path",prefix
+	if(V_Flag)
+		Abort "You Cancelled - Ouch, I have feelings you know...."
+	endif
+	
+	return prefix
 end
 
 Function loadFile(location,filestr)
