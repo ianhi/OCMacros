@@ -434,6 +434,7 @@ Function calcY(path, prefix)
 	
 	String outName="Y_"+prefix
 	SubtractDataSets(prefix+"_C0",prefix+"_C90", 1, outName)
+	fReWrite1DData_noPrompt(outName,"tab","CRLF")
 End
 
 //+++++++++++++++++Utility Functions++++++++++++++++++++++++++++++
