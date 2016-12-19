@@ -334,6 +334,7 @@ Function calcAll()
 	calcX2(path,prefix,90)
 	calcY(path,prefix)
 	calcYZ(path,prefix)
+	calcRatio(path,prefix)
 end
 
 
@@ -435,6 +436,27 @@ Function calcY(path, prefix)
 	String outName="Y_"+prefix
 	SubtractDataSets(prefix+"_C0",prefix+"_C90", 1, outName)
 	fReWrite1DData_noPrompt(outName,"tab","CRLF")
+End
+Function calcRatio(path, prefix)
+	// Calculate the ratio of sec90/sec0  sec90=sector avg at 90 deg
+	String path
+	String prefix
+	
+	String pathPre=path+prefix
+	String Z_Data=prefix+"_C90"
+	String YZ_Data=prefix+"_C0"
+	
+	ASC_Math(pathPre+"_DU.asc",pathPre+"_UD.asc","+")
+	secAvg(90,10,"both",path, Z_Data)
+	ASC_Math(pathPre+"_DU.asc",pathPre+"_UD.asc","-")
+	secAvg(0,10,"both",  path, YZ_Data)
+	loadFile(path,A_Data)
+	loadFile(path,B_Data)
+	
+	String outName = "ratio_"+prefix
+	DivideDataSets(YZ_Data,Z_Data,1,outName)
+	fReWrite1DData_noPrompt(outName,"tab","CRLF")
+
 End
 
 //+++++++++++++++++Utility Functions++++++++++++++++++++++++++++++
